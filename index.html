@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для моєї коханої ❤️</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #ffd6e7 0%, #ffb6d9 100%);
+    min-height: 100vh;
+    text-align: center;
+    overflow-x: hidden;
+}
+h1 { font-size: 2rem; color: white; margin-top: 20px; }
+.highlight { font-weight: 900; letter-spacing: 3px; color: #fff8cc; text-shadow:0 0 5px #fff176,0 0 10px #ffd700,0 0 20px #ffc107,0 0 40px #ffb300; animation: goldenGlow 2s infinite ease-in-out; }
+@keyframes goldenGlow { 0% { text-shadow:0 0 5px #fff176,0 0 10px #ffd700,0 0 20px #ffc107,0 0 40px #ffb300; transform: scale(1);} 50% { text-shadow:0 0 10px #fff9c4,0 0 20px #ffd700,0 0 35px #ffc107,0 0 60px #ff8f00; transform: scale(1.12);} 100% { text-shadow:0 0 5px #fff176,0 0 10px #ffd700,0 0 20px #ffc107,0 0 40px #ffb300; transform: scale(1);} }
+p { color:white; }
+.cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:15px; padding:20px; max-width:500px; margin:0 auto; }
+.card { perspective:1000px; aspect-ratio:3/4; cursor:pointer; }
+.card-inner { position:relative; width:100%; height:100%; transition: transform 0.6s ease; transform-style: preserve-3d; }
+.card.flipped .card-inner { transform: rotateY(180deg); }
+.card-front, .card-back { position:absolute; width:100%; height:100%; border-radius:14px; backface-visibility:hidden; overflow:hidden; }
+.card-front img { width:100%; height:100%; object-fit:cover; }
+.card-front-overlay { position:absolute; width:100%; height:100%; background: rgba(255,105,180,0.25);}
+.card-front-label { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-weight:bold;}
+.card-back { background: linear-gradient(135deg,#ff99cc,#ff66b2); transform:rotateY(180deg); padding:15px; box-sizing:border-box; color:white; display:flex; flex-direction:column; justify-content:center;}
+.card-back-title { font-weight:bold; font-size:14px; margin-bottom:10px; }
+.card-back-text { font-size:12px; line-height:1.4; white-space:pre-wrap;}
+#riddleBlock, #movieReveal { display:none; margin-top:30px; color:white; text-align:center; }
+#riddleBlock input { padding:8px; border-radius:8px; border:none; text-align:center; }
+#riddleBlock button { padding:8px 16px; border:none; border-radius:8px; background:#ffd700; font-weight:bold; cursor:pointer; }
+.fade-out { animation: fadeOut 1s forwards; }
+@keyframes fadeOut { to { opacity: 0; transform: scale(0.9); } }
+.fade-in { animation: fadeIn 1s forwards; }
+@keyframes fadeIn { from { opacity:0; transform:scale(1.2);} to { opacity:1; transform:scale(1);} }
+.riddle-emoji { font-size:40px; display:inline-block; animation: bounce 1.5s infinite; }
+@keyframes bounce { 0%,100% { transform:translateY(0);} 50% { transform:translateY(-10px);} }
+.confetti { position:fixed; top:-20px; pointer-events:none; font-size:20px; animation:fall linear forwards; z-index:9999; }
+@keyframes fall { 0% { transform:translateY(0) rotate(0deg); opacity:1;} 100% { transform:translateY(100vh) rotate(360deg); opacity:0;} }
+</style>
+</head>
+<body>
+
+<h1>Моя кохана <span class="highlight">ДА</span> 💖</h1>
+<p>Натисни на кожну картку</p>
+
+<div class="cards" id="cards"></div>
+
+<div id="riddleBlock">
+    <h3>А тепер відгадай куди ми завтра підемо 😏</h3>
+    <p class="riddle-emoji">🎬 🍿 📺 🥤</p>
+    <div style="margin-top:20px;">
+        <button onclick="showMovie()">🎬 Кіно</button>
+        <button onclick="showMovie()">🌊 Море</button>
+        <button onclick="showMovie()">🏰 Замок</button>
+        <button onclick="showMovie()">✈️ Подорож</button>
+    </div>
+</div>
+
+<div id="movieReveal">
+    <h2>🎉 Завтра нас чекає кіно о 19:00 біля Smart Plaza на Політехнічній. Білети вже в мене 🍊
+
+Люблю тебе, кохана, безмежно ❤️. Будь щаслива та усміхнена кожного дня! 🌸💖</h2>
+    <img src="https://cdn.planetakino.ua/18047_wuthering-heights_2025/Media/Posters/vertical/opt_04253747-8a6f-473c-8a6a-d597a1eb7c6f.webp" style="width:20%; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.4);">
+    <h3 style="margin-top:15px;">🎬 Буремний перевал</h3>
+    <p style="font-size:18px;">Давай завтра насолоджуватись кіно та пити апельсиновий сік! 🥤🍿</p>
+    <audio id="romanticMusic" src="./2.mp3" autoplay></audio>
+</div>
+
+<script>
+const photoCount = 13;
+let flippedCount = 0;
+
+const captions = [
+{title:"🌅 З тобою починається мій світ", text:"Кожен мій день стає кращим просто тому, що в ньому є ти.\nТи — мій спокій і мій дім."},
+{title:"💫 Ти — моє натхнення", text:"Поруч із тобою хочеться рости і ставати кращим."},
+{title:"🌸 Твоя доброта — магія", text:"Ти робиш цей світ теплішим."},
+{title:"☀️ Твоя усмішка — мій антистрес", text:"Навіть у важкий день ти рятуєш мене."},
+{title:"💌 Ти — моя підтримка", text:"Коли я сумніваюсь — ти віриш у мене."},
+{title:"🔥 Ти неймовірна", text:"Красива. Розумна. Сильна."},
+{title:"🌙 З тобою легко", text:"Навіть мовчати з тобою — щастя."},
+{title:"💎 Ти унікальна", text:"Немає нікого схожого на тебе."},
+{title:"🌈 Ти — мій настрій", text:"Ти робиш кожен день яскравішим."},
+{title:"🕊 Ти — мій спокій", text:"Поруч із тобою я вдома."},
+{title:"🌹 Ти прекрасна", text:"І зовні, і всередині."},
+{title:"🚀 З тобою я можу все", text:"Ти даєш мені силу мріяти."},
+{title:"🎂 З Днем Народження", text:"Я безмежно щасливий, що ти моя 💖"}
+];
+
+const container = document.getElementById("cards");
+
+// Створення карток
+for(let i=1;i<=photoCount;i++){
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+    <div class="card-inner">
+        <div class="card-front">
+            <img src="images/${i}.jpg">
+            <div class="card-front-overlay"></div>
+            <div class="card-front-label">Натисни</div>
+        </div>
+        <div class="card-back">
+            <div class="card-back-title">${captions[i-1].title}</div>
+            <div class="card-back-text">${captions[i-1].text}</div>
+        </div>
+    </div>`;
+    card.onclick = () => {
+        if(!card.classList.contains("flipped")) flippedCount++;
+        card.classList.add("flipped");
+        if(flippedCount === photoCount){
+            container.classList.add("fade-out");
+            setTimeout(()=>{
+                container.style.display="none";
+                const riddle = document.getElementById("riddleBlock");
+                riddle.style.display="block";
+                riddle.classList.add("fade-in");
+            },1000);
+        }
+    }
+    container.appendChild(card);
+}
+
+// показ афіші
+function showMovie(){
+    document.getElementById("riddleBlock").style.display="none";
+    const movie=document.getElementById("movieReveal");
+    movie.style.display="block";
+    document.getElementById("romanticMusic").play();
+}
+
+// падаючі серця/квіти завжди
+function createFallItem(){
+    const el=document.createElement("div");
+    el.className="confetti";
+    const symbols=['🌹','🌸','❤️','💖'];
+    el.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    el.style.left=Math.random()*100+"vw";
+    el.style.fontSize=(Math.random()*25+15)+"px";
+    el.style.color=['#FF69B4','#FF4500','#FF1493','#FFB6C1','#FF6347'][Math.floor(Math.random()*5)];
+    el.style.animationDuration=(Math.random()*4+4)+"s";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),4000);
+}
+
+// Створюємо постійний потік падаючих елементів
+setInterval(createFallItem,300);
+</script>
+</body>
+</html>
